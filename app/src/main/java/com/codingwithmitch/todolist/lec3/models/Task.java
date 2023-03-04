@@ -1,4 +1,4 @@
-package com.codingwithmitch.todolist.models;
+package com.codingwithmitch.todolist.lec3.models;
 
 public class Task {
 

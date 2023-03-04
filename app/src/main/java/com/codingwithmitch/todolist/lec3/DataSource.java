@@ -1,6 +1,6 @@
-package com.codingwithmitch.todolist.util;
+package com.codingwithmitch.todolist.lec3.util;
 
-import com.codingwithmitch.todolist.models.Task;
+import com.codingwithmitch.todolist.lec3.models.Task;
 
 import java.util.ArrayList;
 import java.util.List;
