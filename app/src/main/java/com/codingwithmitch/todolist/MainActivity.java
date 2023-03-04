@@ -5,24 +5,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.codingwithmitch.todolist.models.Task;
-import com.codingwithmitch.todolist.util.DataSource;
-
-
-import java.util.List;
-
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.codingwithmitch.todolist.models.Task;
+import com.codingwithmitch.todolist.util.DataSource;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -40,171 +34,121 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         text = findViewById(R.id.text);
+        rxObservableExample3();
 
+    }
 
-//        text.setText("doing stuff...");
-//        Observable.fromIterable(DataSource.createTasksList())
-//                .filter(new Predicate<Task>() {
-//                    @Override
-//                    public boolean test(Task task) throws Exception {
-//                        return task.isComplete();
-//                    }
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .distinct(new Function<Task, String>() {
-//                    @Override
-//                    public String apply(Task task) throws Exception {
-//                        return task.getTask();
-//                    }
-//                })
-//                .subscribe(new Observer<Task>() {
-//                    @Override
-//                    public void onSubscribe(Disposable d) {
-//                        Log.d(TAG, "onSubscribe: called.");
-//                        disposables.add(d);
-//                    }
-//
-//                    @Override
-//                    public void onNext(Task value) {
-//                        Log.d(TAG, "onNext: COMPLETE: " + value.getTask());
-//                        text.setText("still doing stuff...");
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e(TAG, "onError: ", e);
-//                    }
-//
-//                    @Override
-//                    public void onComplete() {
-//                        Log.d(TAG, "onComplete: found all the completed tasks...");
-//                        text.setText("done");
-//                    }
-//                });
-
-
-//        Observable<Task> observableTasksList = Observable.fromIterable(DataSource.createTasksList());
-
-//        Observable<Integer> integers = Observable.from(DataSource.createTasksList())
-//                .map(new Func1<Task, Integer>() {
-//                    @Override
-//                    public Integer call(Task task) {
-//                        return task.getPriority();
-//                    }
-//                });
-//        MathObservable
-//                .max(integers)
-//                .subscribe(new Subscriber<Integer>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        Log.d(TAG, "onCompleted: done.");
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e(TAG, "onError: ", e);
-//                    }
-//
-//                    @Override
-//                    public void onNext(Integer integer) {
-//                        Log.d(TAG, "onNext: " + integer);
-//                    }
-//                });
-
-
-        Observable<Task> taskObservable = Observable
-                .fromIterable(DataSource.createTasksList())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        taskObservable.subscribe(new Observer<Task>() {
+    /*
+    Not defining subscribeOn and observerOn will automatically use the main thread.
+    If one of the above is defined, the thread defined in that will be used for both subscribeOn and observeOn.
+     */
+    private void rxObservableExample3() {
+        Observable.fromIterable(DataSource.createTasksList()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Task>() {
             @Override
             public void onSubscribe(Disposable d) {
-
+                Log.d(TAG, "onSubscribe: ");
             }
 
             @Override
             public void onNext(Task task) {
-                Log.d(TAG, "onNext: : " + task.getDescription());
+                Log.d(TAG, "onNext: " + Thread.currentThread().getName());
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Log.d(TAG, "onError: ");
             }
 
             @Override
             public void onComplete() {
-
+                Log.d(TAG, "onComplete: ");
             }
         });
-
-
-        Observable.range(0,3)
-                .repeat(2)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Integer>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(Integer integer) {
-                        Log.d(TAG, "onNext: " + integer);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
     }
 
+    private void rxObservableExample2() {
+         /*
+        Sleeping the background thread will not freeze the ui
+         */
+        Observable.fromIterable(DataSource.createTasksList()).subscribeOn(Schedulers.io()).filter(new Predicate<Task>() {
+            @Override
+            public boolean test(Task task) throws Exception {
+                // Thread.sleep will sleep the background io thread. We use the filter operator here
+                Log.d(TAG, "test: " + Thread.currentThread().getName()); // prints a background thread RxCachedThreadScheduler-1
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return task.isComplete();
+            }
+        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Task>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+            }
+
+            @Override
+            public void onNext(Task task) {
+            }
+
+            @Override
+            public void onError(Throwable e) {
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        });
+    }
+
+
+    /*
+    What thread to do work on: subscribeOn
+
+    What thread to observe the response on: observeOn
+
+    Do the work on Schedulers.io() thread and return the result on AndroidSchedulers.mainThread();
+   */
+    private void rxObservableExample1() {
+
+        Observable<Task> observable = Observable.fromIterable(DataSource.createTasksList()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(d -> {
+            Log.d(TAG, "doOnSubscribe: " + Thread.currentThread().getName());
+        });
+
+        observable.subscribe(new Observer<Task>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                Log.d(TAG, "onSubscribe: " + Thread.currentThread().getName());
+            }
+
+            @Override
+            public void onNext(Task task) {
+                Log.d(TAG, "onNext: " + Thread.currentThread().getName());
+                Log.d(TAG, "onNext: " + task.getDescription());
+//                        Thread.sleep will sleep the main thread and ui will freeze
+//                        try {
+//                            Thread.sleep(1000);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG, "onError: ");
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG, "onComplete: ");
+            }
+        });
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 //        disposables.clear();
     }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
