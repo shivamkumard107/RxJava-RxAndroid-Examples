@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.codingwithmitch.todolist.R;
 import com.codingwithmitch.todolist.lec3.models.Task;
-import com.codingwithmitch.todolist.lec3.util.DataSource;
+import com.codingwithmitch.todolist.lec6.CreateOperator;
+import com.codingwithmitch.todolist.lec7.IntervalAndTimerOperator;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         text = findViewById(R.id.text);
+        IntervalAndTimerOperator operator = new IntervalAndTimerOperator();
 
     }
 

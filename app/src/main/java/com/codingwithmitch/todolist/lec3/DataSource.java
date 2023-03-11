@@ -1,4 +1,4 @@
-package com.codingwithmitch.todolist.lec3.util;
+package com.codingwithmitch.todolist.lec3;
 
 import com.codingwithmitch.todolist.lec3.models.Task;
 

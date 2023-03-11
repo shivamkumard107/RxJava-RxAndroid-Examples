@@ -3,7 +3,6 @@ package com.codingwithmitch.todolist.lec3;
 import android.util.Log;
 
 import com.codingwithmitch.todolist.lec3.models.Task;
-import com.codingwithmitch.todolist.lec3.util.DataSource;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
