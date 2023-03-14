@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.codingwithmitch.todolist.R;
+import com.codingwithmitch.todolist.lec3.FromIterable;
 import com.codingwithmitch.todolist.lec3.models.Task;
 import com.codingwithmitch.todolist.lec6.CreateOperator;
 import com.codingwithmitch.todolist.lec7.IntervalAndTimerOperator;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         text = findViewById(R.id.text);
-        IntervalAndTimerOperator operator = new IntervalAndTimerOperator();
+        FromIterable operator = new FromIterable();
 
     }
 

@@ -9,6 +9,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
@@ -20,7 +21,7 @@ public class FromIterable {
     CompositeDisposable disposables = new CompositeDisposable();
 
     public FromIterable() {
-//        rxObservableExample1();
+        rxObservableExample1();
 //        rxObservableExample2();
 //        rxObservableExample3();
     }
@@ -98,38 +99,48 @@ public class FromIterable {
    */
     public void rxObservableExample1() {
 
-        Observable<Task> observable = Observable.fromIterable(DataSource.createTasksList()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(d -> {
-            Log.d(TAG, "doOnSubscribe: " + Thread.currentThread().getName());
-        });
+        Observable<Task> observable = Observable
+                .fromIterable(DataSource.createTasksList())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(d -> {
+                    Log.d(TAG, "doOnSubscribe: " + Thread.currentThread().getName());
+                });
 
-        observable.subscribe(new Observer<Task>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                Log.d(TAG, "onSubscribe: " + Thread.currentThread().getName());
-            }
+        observable
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.d(TAG, "run: onDisposed");
+                    }
+                }).subscribe(new Observer<Task>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposables.add(d);
+                    }
 
-            @Override
-            public void onNext(Task task) {
-                Log.d(TAG, "onNext: " + Thread.currentThread().getName());
-                Log.d(TAG, "onNext: " + task.getDescription());
+                    @Override
+                    public void onNext(Task task) {
+                        Log.d(TAG, "onNext: " + Thread.currentThread().getName());
+                        Log.d(TAG, "onNext: " + task.getDescription());
 //                        Thread.sleep will sleep the main thread and ui will freeze
 //                        try {
 //                            Thread.sleep(1000);
 //                        } catch (Exception e) {
 //                            e.printStackTrace();
 //                        }
-            }
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                Log.d(TAG, "onError: ");
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "onError: ");
+                    }
 
-            @Override
-            public void onComplete() {
-                Log.d(TAG, "onComplete: ");
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete: ");
+                    }
+                });
     }
 }
 

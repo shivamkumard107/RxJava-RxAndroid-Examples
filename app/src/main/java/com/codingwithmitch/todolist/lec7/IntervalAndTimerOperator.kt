@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 class IntervalAndTimerOperator {
     init {
-        createFromInterval();
+//        createFromInterval();
         createFromTimer();
     }
     private fun createFromInterval() {
@@ -38,7 +38,25 @@ class IntervalAndTimerOperator {
     }
     
     private fun createFromTimer() {
-        
+        Observable.timer(2000, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Long>{
+                override fun onSubscribe(d: Disposable) {
+                    Log.d(TAG, "onSubscribe: ")
+                }
+
+                override fun onNext(t: Long) {
+                    Log.d(TAG, "onNext: $t")
+                }
+
+                override fun onError(e: Throwable) {
+                }
+
+                override fun onComplete() {
+                }
+
+            })
     }
     companion object {
         private const val TAG = "IntervalAndTimerOp"
